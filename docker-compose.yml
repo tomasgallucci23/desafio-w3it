@@ -1,0 +1,23 @@
+version: "3.7"
+services:
+  backend:
+    build:
+      context: ./api-rest
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000" # Mapea el puerto de la aplicación
+    environment:
+      - MONGO_DB=mongodb://mongo:27017/myapp
+    links:
+      - mongo
+    restart: on-failure
+  front:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    ports:
+      - "8080:80" # Mapea el puerto de la aplicación
+  mongo:
+    image: mongo:latest
+    ports:
+      - "27017:27017" # Mapea el puerto de MongoDB

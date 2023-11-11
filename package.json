@@ -1,0 +1,16 @@
+{
+  "name": "desafio-w3it",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test-api": "cd api-rest && npm run test",
+    "test-app": "cd app && npm run test",
+    "test": "npm run test-api && npm run test-app",
+    "start": "docker-compose up",
+    "prestart": "docker-compose build"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
