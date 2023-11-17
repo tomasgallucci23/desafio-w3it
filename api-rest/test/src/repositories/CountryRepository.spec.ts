@@ -1,7 +1,7 @@
 import mongoose, { Mongoose } from "mongoose";
 import { MongoMemoryServer } from "mongodb-memory-server";
-import CountrySchema from "../../src/dataAccess/schemas/implementation/CountrySchema";
-import CountryRepository from "../../src/repositories/CountryRepository";
+import CountrySchema from "../../../src/dataAccess/schemas/implementation/CountrySchema";
+import CountryRepository from "../../../src/repositories/implements/CountryRepository";
 
 describe("CountryRepository", () => {
   let mongoServer: MongoMemoryServer;
@@ -49,9 +49,14 @@ describe("CountryRepository", () => {
     const countryRepository = new CountryRepository();
     const pattern = "Filtered";
     const keyToFind = "name";
-    const result = await countryRepository.filterWithPattern(
-      pattern,
-      keyToFind
+    const cond = {
+      [keyToFind]: new RegExp(pattern, "i"),
+    };
+
+    const result = await countryRepository.filter(
+      cond,
+      { _id: 1, name: 1, population: 1 },
+      { limit: 5 }
     );
 
     expect(result).toHaveLength(1);
