@@ -11,7 +11,8 @@
     "migrate:up": "ts-node migrations/index.ts up",
     "migrate:down": "ts-node migrations/index.ts down -a",
     "migrate:create": "ts-node migrations/index.ts new --template-file ./migrations/scripts/create.ts --name",
-    "test": "jest"
+    "test": "jest",
+    "test:coverage": "jest --coverage"
   },
   "keywords": [],
   "author": "",

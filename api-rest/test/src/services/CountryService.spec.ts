@@ -1,8 +1,10 @@
-import CountryService from "../../services/implementations/CountryService";
 import { ICountryDTO } from "../../../src/dataAccess/dto/abstracts/ICountryDTO";
 import { CountryDTO } from "../../../src/dataAccess/dto/implementations/CountryDTO";
 // @ts-ignore
 import { GetRandomCountries } from "../../mocks/CountryMock";
+import CountryService from "../../../src/services/implementations/CountryService";
+import ICountryModel from "../../../src/dataAccess/models/abstracts/ICountryModel";
+import CountryRepository from "../../../src/repositories/implements/CountryRepository";
 
 describe("CountryService", () => {
   let countryService: CountryService;
@@ -12,15 +14,14 @@ describe("CountryService", () => {
   });
 
   it("should return all countries", async () => {
-    const mockCountries: ICountryDTO = new CountryDTO(GetRandomCountries(2));
+    const mockCountries: ICountryModel[] = GetRandomCountries(2);
     jest
-      .spyOn(CountryService.prototype, "getAll")
+      .spyOn(CountryRepository.prototype, "getAll")
       .mockResolvedValue(mockCountries);
 
     const result = await countryService.getAll();
 
-    expect(result).toEqual(mockCountries);
-    expect(result.total).toEqual(mockCountries.total);
+    expect(result).toEqual(new CountryDTO(mockCountries));
   });
 
   it("should filter countries with a pattern", async () => {
