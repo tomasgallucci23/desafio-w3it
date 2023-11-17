@@ -1,5 +1,5 @@
 export default interface ICountryModel {
-  _id: string;
+  _id: number;
   name: string;
   population: number;
 }
