@@ -1,21 +1,20 @@
 import { Request, Response } from "express";
-import CountrySchema from "../../../dataAccess/schemas/implementation/CountrySchema";
-import CountryService from "../../../services/CountryService";
-import CountryModel from "../../../dataAccess/models/implementation/CountryModel";
-import CountryMapper from "../../../dataAccess/mapper/CountryMapper";
-import ICountrySchema from "../../../dataAccess/schemas/abstracts/ICountrySchema";
+import CountryService from "../../../services/implementations/CountryService";
 const countryService = new CountryService();
-const countryMapped = new CountryMapper();
 
-export const getAllCountrys = async (req: Request, res: Response) => {
+export const getAllCountrys = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
   const result = await countryService.getAll();
-  const dataMapped = result.map((country: ICountrySchema) =>
-    countryMapped.fromModelToMongoose(country)
-  );
-  return res.status(200).json(dataMapped);
+
+  return res.status(200).json(result);
 };
 
-export const filterCountry = async (req: Request, res: Response) => {
+export const filterCountry = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
   const { country } = req.query;
   const countryPattern = country?.toString() || "";
   if (countryPattern?.length < 3) {
@@ -23,8 +22,6 @@ export const filterCountry = async (req: Request, res: Response) => {
   }
 
   const result = await countryService.filterWithPattern(countryPattern, "name");
-  const dataMapped = result.map((country: ICountrySchema) =>
-    countryMapped.fromModelToMongoose(country)
-  );
-  return res.status(200).json(dataMapped);
+
+  return res.status(200).json(result);
 };
