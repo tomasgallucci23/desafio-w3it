@@ -1,5 +1,5 @@
-export default interface ICountrySchema extends Document {
-  _id: string;
+export default interface ICountrySchema {
+  _id: number;
   name: string;
   population: number;
 }
