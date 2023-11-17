@@ -40,18 +40,23 @@
   display: flex;
   justify-content: center;
   margin: 25px 0;
+}
 
-  .table-container,
-  .input-container {
-    display: flex;
-    width: 100%;
-  }
+.table-container,
+.input-container,
+.search-container {
+  display: flex;
+  width: 100%;
+}
 
-  .input-container {
-    align-items: center;
-    padding: 5px;
-    flex-direction: column;
-  }
+.search-container {
+  align-items: center;
+  padding: 5px;
+  flex-direction: column;
+}
+
+.input-container {
+  flex-direction: row;
 }
 
 input[type="text"] {
@@ -64,4 +69,13 @@ input[type="text"] {
   resize: none;
   color: white;
   font-weight: 600;
+}
+
+button {
+  padding: 0.5rem;
+  border-width: 1px;
+  border-radius: 0.125rem;
+  cursor: pointer;
+  border-color: rgba(120, 154, 210, 0.9);
+  width: 20%;
 }

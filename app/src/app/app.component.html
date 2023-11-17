@@ -3,6 +3,7 @@
     <table class="styled-table">
       <thead>
         <tr>
+          <th>#</th>
           <th>Nombre del pais</th>
           <th>Población</th>
           <th>Porcentaje de la población</th>
@@ -11,6 +12,7 @@
       <tbody>
         <ng-container *ngIf="countries.length; else NotFoundCountries">
           <tr *ngFor="let data of countries">
+            <td>{{ data._id }}</td>
             <td>{{ data.name }}</td>
             <td>{{ data.population }}</td>
             <td>{{ data.percentage }} %</td>
@@ -19,13 +21,16 @@
       </tbody>
     </table>
   </div>
-  <div class="input-container">
+  <div class="search-container">
     <h2>Buscador de paises</h2>
-    <input
-      type="text"
-      placeholder="Busque un pais"
-      [formControl]="searchCountry"
-    />
+    <div class="input-container">
+      <input
+        type="text"
+        placeholder="Busque un pais"
+        [formControl]="searchCountry"
+      />
+      <button (click)="btnSearchCountry()">Buscar</button>
+    </div>
   </div>
 </div>
 

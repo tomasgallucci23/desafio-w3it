@@ -1,6 +1,7 @@
 import { ChangeDetectorRef, Component } from '@angular/core';
 import { CountryService } from './services/country.service';
 import { FormControl } from '@angular/forms';
+import { CountryModel } from './models/CountryModel';
 
 @Component({
   selector: 'app-root',
@@ -8,16 +9,16 @@ import { FormControl } from '@angular/forms';
   styleUrls: ['./app.component.css'],
 })
 export class AppComponent {
-  countries: { name: string; population: number; percentage: string }[] = [];
+  countries: CountryModel[] = [];
 
-  searchCountry = new FormControl();
+  searchCountry = new FormControl('');
+
   constructor(private countryService: CountryService) {
     this.searchCountry.valueChanges.subscribe((res) => {
       if (!res || res.length < 1) {
         this.resetCountries();
         return;
       }
-      this.filterCountry(res);
     });
   }
 
@@ -34,10 +35,13 @@ export class AppComponent {
 
   filterCountry(pattern: string) {
     this.countryService.filterCountry(pattern).subscribe((res) => {
-      if (pattern.length >= 3) {
-        this.countries = res;
-      }
+      this.countries = res;
     });
+  }
+
+  btnSearchCountry() {
+    const res = this.searchCountry.getRawValue();
+    this.filterCountry(res || '');
   }
 
   resetCountries() {

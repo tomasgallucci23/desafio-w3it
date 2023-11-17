@@ -4,23 +4,19 @@ import {
   fakeAsync,
   tick,
 } from '@angular/core/testing';
+import { AppComponent } from './app.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { of } from 'rxjs';
-import { AppComponent } from './app.component';
 import { CountryService } from './services/country.service';
+import { CountryModel } from './models/CountryModel';
 
 describe('AppComponent', () => {
-  let component: AppComponent;
   let fixture: ComponentFixture<AppComponent>;
+  let component: AppComponent;
   let countryService: jasmine.SpyObj<CountryService>;
 
-  const mockCountries = [
-    { name: 'Country 1', population: 1000000, percentage: '10%' },
-    { name: 'Country 2', population: 2000000, percentage: '20%' },
-  ];
-
   beforeEach(() => {
-    countryService = jasmine.createSpyObj('CountryService', [
+    const countryServiceSpy = jasmine.createSpyObj('CountryService', [
       'getAllCountry',
       'filterCountry',
     ]);
@@ -28,19 +24,22 @@ describe('AppComponent', () => {
     TestBed.configureTestingModule({
       declarations: [AppComponent],
       imports: [ReactiveFormsModule],
-      providers: [{ provide: CountryService, useValue: countryService }],
+      providers: [{ provide: CountryService, useValue: countryServiceSpy }],
     });
 
     fixture = TestBed.createComponent(AppComponent);
     component = fixture.componentInstance;
-    countryService.getAllCountry.and.returnValue(of(mockCountries));
+    countryService = TestBed.inject(
+      CountryService
+    ) as jasmine.SpyObj<CountryService>;
   });
 
-  it('should create the app', () => {
-    expect(component).toBeTruthy();
-  });
+  it('debería obtener todos los países al inicializar el componente', () => {
+    const mockCountries: CountryModel[] = [
+      { _id: 1, name: 'Country1', population: 100, percentage: '33.333' },
+      { _id: 2, name: 'Country2', population: 200, percentage: '66.666' },
+    ];
 
-  it('should fetch countries on ngOnInit', () => {
     countryService.getAllCountry.and.returnValue(of(mockCountries));
 
     fixture.detectChanges();
@@ -48,34 +47,56 @@ describe('AppComponent', () => {
     expect(component.countries).toEqual(mockCountries);
   });
 
-  it('should reset countries when search input is less than 3 characters', () => {
-    component.countries = mockCountries;
+  it('debería filtrar países al cambiar el valor del campo de búsqueda', fakeAsync(() => {
+    const mockFilteredCountries: CountryModel[] = [
+      { _id: 1, name: 'Country1', population: 150, percentage: '37.500' },
+      { _id: 2, name: 'Country2', population: 250, percentage: '62.500' },
+    ];
 
-    component.searchCountry.setValue('ab');
+    countryService.filterCountry.and.returnValue(of(mockFilteredCountries));
+
+    component.searchCountry.setValue('Filter');
+    const btn: HTMLButtonElement =
+      fixture.nativeElement.querySelector('button');
+    btn.click();
+    // Espera a que se resuelva la promesa
+    tick();
+
+    expect(component.countries).toEqual(mockFilteredCountries);
+  }));
+
+  it('debería restablecer los países desde el almacenamiento local', () => {
+    const mockStoredCountries: CountryModel[] = [
+      {
+        _id: 1,
+        name: 'StoredCountry1',
+        population: 120,
+        percentage: '35.294',
+      },
+      {
+        _id: 2,
+        name: 'StoredCountry2',
+        population: 220,
+        percentage: '64.706',
+      },
+    ];
+
+    localStorage.setItem('countries', JSON.stringify(mockStoredCountries));
 
     component.resetCountries();
-    fixture.whenStable().then(() => {
-      expect(component.countries).toEqual(mockCountries);
-    });
+
+    expect(component.countries).toEqual(mockStoredCountries);
   });
 
-  it('should filter countries when search input has 3 or more characters', () => {
-    countryService.filterCountry.and.returnValue(of([]));
+  it('debería llamar a filterCountry al hacer clic en el botón de búsqueda', () => {
+    const filterCountrySpy = spyOn(component, 'filterCountry');
 
-    component.countries = mockCountries;
+    component.searchCountry.setValue('Search');
+    const btn: HTMLButtonElement =
+      fixture.nativeElement.querySelector('button');
+    btn.click();
+    component.btnSearchCountry();
 
-    component.filterCountry('abc');
-    expect(component.countries).toEqual([]);
-  });
-
-  it('should see all countries when clean input', () => {
-    countryService.filterCountry.and.returnValue(of([]));
-
-    component.countries = mockCountries;
-
-    component.filterCountry('abc');
-    component.searchCountry.setValue('');
-
-    expect(component.countries).toEqual(mockCountries);
+    expect(filterCountrySpy).toHaveBeenCalledWith('Search');
   });
 });
