@@ -34,7 +34,7 @@ describe('AppComponent', () => {
     ) as jasmine.SpyObj<CountryService>;
   });
 
-  it('debería obtener todos los países al inicializar el componente', () => {
+  it('should be return all countries when start component', () => {
     const mockCountries: CountryModel[] = [
       { _id: 1, name: 'Country1', population: 100, percentage: '33.333' },
       { _id: 2, name: 'Country2', population: 200, percentage: '66.666' },
@@ -47,25 +47,43 @@ describe('AppComponent', () => {
     expect(component.countries).toEqual(mockCountries);
   });
 
-  it('debería filtrar países al cambiar el valor del campo de búsqueda', fakeAsync(() => {
+  it('should be filter countries when input changes and click button', fakeAsync(() => {
     const mockFilteredCountries: CountryModel[] = [
-      { _id: 1, name: 'Country1', population: 150, percentage: '37.500' },
-      { _id: 2, name: 'Country2', population: 250, percentage: '62.500' },
+      {
+        _id: 1,
+        name: 'Filter Country 1',
+        population: 150,
+        percentage: '37.500',
+      },
+      {
+        _id: 2,
+        name: 'Filter Country 2',
+        population: 250,
+        percentage: '62.500',
+      },
     ];
 
-    countryService.filterCountry.and.returnValue(of(mockFilteredCountries));
+    component.countries = mockFilteredCountries;
 
-    component.searchCountry.setValue('Filter');
+    const filterBy = 'Filter Country 1';
+
+    const filtered = mockFilteredCountries.find(
+      (country) => country.name == filterBy
+    );
+
+    const mockedResult = filtered ? [filtered] : [];
+
+    countryService.filterCountry.and.returnValue(of(mockedResult));
+
+    component.searchCountry.setValue(filterBy);
     const btn: HTMLButtonElement =
       fixture.nativeElement.querySelector('button');
     btn.click();
-    // Espera a que se resuelva la promesa
     tick();
-
-    expect(component.countries).toEqual(mockFilteredCountries);
+    expect(component.countries).toEqual(mockedResult);
   }));
 
-  it('debería restablecer los países desde el almacenamiento local', () => {
+  it('should be reset countries from localStorage', () => {
     const mockStoredCountries: CountryModel[] = [
       {
         _id: 1,
@@ -88,7 +106,7 @@ describe('AppComponent', () => {
     expect(component.countries).toEqual(mockStoredCountries);
   });
 
-  it('debería llamar a filterCountry al hacer clic en el botón de búsqueda', () => {
+  it('should be call filterCountry when button is clicked', () => {
     const filterCountrySpy = spyOn(component, 'filterCountry');
 
     component.searchCountry.setValue('Search');
