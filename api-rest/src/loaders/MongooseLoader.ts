@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import { seedCountryData } from "../seed/seedCountryData";
 import environment from "../config/environment";
 export async function MongooseLoader(global: any) {
   const {
@@ -9,8 +8,6 @@ export async function MongooseLoader(global: any) {
   await mongoose.connect(uri);
 
   console.log("DB is connected");
-
-  await seedCountryData();
 
   console.log("Finalize Mongoose loader");
 }
