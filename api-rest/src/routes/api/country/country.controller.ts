@@ -21,7 +21,7 @@ export const filterCountry = async (
     return res.sendStatus(204);
   }
 
-  const result = await countryService.filterWithPattern(countryPattern, "name");
+  const result = await countryService.filterByPattern(countryPattern);
 
   return res.status(200).json(result);
 };

@@ -16,22 +16,16 @@ export default class CountryService implements ICountryService {
 
   async getAll(): Promise<ICountryDTO> {
     const result = await this.repository.getAll();
-    const mappedDTO = this.mapper.fromModelsToDTO(result);
-    this.totalPopulation = mappedDTO.total;
-    return mappedDTO;
+    return this.mapper.fromModelsToDTO(result);
   }
 
-  async filterWithPattern(
-    pattern: string,
-    keyToFind: string
-  ): Promise<ICountryDTO> {
-    const result = await this.repository.filter(
-      { [keyToFind]: new RegExp(pattern, "i") },
-      { _id: 1, name: 1, population: 1 },
-      { limit: 5 }
+  async filterByPattern(pattern: string): Promise<ICountryDTO> {
+    const result = await this.getAll();
+
+    result.countries = result.countries.filter((country) =>
+      country.name.includes(pattern)
     );
-    const mappedDTO = this.mapper.fromModelsToDTO(result);
-    mappedDTO.total = this.totalPopulation;
-    return mappedDTO;
+
+    return result;
   }
 }

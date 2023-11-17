@@ -31,15 +31,10 @@ describe("CountryService", () => {
     const countryName = mockFilteredCountries.countries[2].name;
 
     jest
-      .spyOn(CountryService.prototype, "filterWithPattern")
+      .spyOn(CountryService.prototype, "filterByPattern")
       .mockResolvedValue(mockFilteredCountries);
 
-    const keyToFind = "name";
-
-    const result = await countryService.filterWithPattern(
-      countryName,
-      keyToFind
-    );
+    const result = await countryService.filterByPattern(countryName);
 
     expect(result).toEqual(mockFilteredCountries);
     expect(result.total).toEqual(mockFilteredCountries.total);
