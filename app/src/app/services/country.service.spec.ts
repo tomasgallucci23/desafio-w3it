@@ -19,36 +19,48 @@ describe('CountryService', () => {
     httpMock = TestBed.inject(HttpTestingController);
   });
 
+  afterEach(() => {
+    httpMock.verify();
+  });
+
   it('should be created', () => {
     expect(service).toBeTruthy();
   });
 
-  it('should retrieve countries from the API', () => {
-    const mockCountries = [
-      { name: 'Country 1', population: 1000000, percentage: '33.333' },
-      { name: 'Country 2', population: 2000000, percentage: '66.667' },
-    ];
+  it('should retrieve countries from the API and calculate percentage', () => {
+    const mockCountries = {
+      countries: [
+        { _id: '1', name: 'Country1', population: 100 },
+        { _id: '2', name: 'Country2', population: 200 },
+      ],
+      total: 300,
+    };
 
     service.getAllCountry().subscribe((countries) => {
-      expect(countries).toEqual(mockCountries);
+      expect(countries.length).toBe(2);
+      expect(countries[0].percentage).toBe('33.333');
+      expect(countries[1].percentage).toBe('66.667');
     });
 
     const req = httpMock.expectOne(`${environment.baseUrl}/country`);
     expect(req.request.method).toBe('GET');
     req.flush(mockCountries);
-
-    httpMock.verify();
   });
 
   it('should filter countries based on countryPattern', () => {
-    const countryPattern = 'pattern';
-    const mockFilteredCountries = [
-      { name: 'Country 1', population: 1000000, percentage: '33.333' },
-      { name: 'Country 2', population: 2000000, percentage: '66.667' },
-    ];
+    const countryPattern = 'Country';
+    const mockFilteredCountries = {
+      countries: [
+        { _id: '1', name: 'Country1', population: 100 },
+        { _id: '2', name: 'Country2', population: 200 },
+      ],
+      total: 300,
+    };
 
-    service.filterCountry(countryPattern).subscribe((filteredCountries) => {
-      expect(filteredCountries).toEqual(mockFilteredCountries);
+    service.filterCountry(countryPattern).subscribe((countries) => {
+      expect(countries.length).toBe(2);
+      expect(countries[0].percentage).toBe('33.333');
+      expect(countries[1].percentage).toBe('66.667');
     });
 
     const req = httpMock.expectOne(
@@ -56,7 +68,5 @@ describe('CountryService', () => {
     );
     expect(req.request.method).toBe('GET');
     req.flush(mockFilteredCountries);
-
-    httpMock.verify();
   });
 });

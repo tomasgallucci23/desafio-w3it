@@ -1,26 +1,24 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { map, of, tap } from 'rxjs';
+import { Observable, map, of, tap } from 'rxjs';
 import { environment } from 'src/environments/environment';
+import { CountriesModel } from '../models/CountriesModel';
+import { CountryModel } from '../models/CountryModel';
 
 @Injectable({
   providedIn: 'root',
 })
 export class CountryService {
   constructor(private httpClient: HttpClient) {}
-  totalPopulation: number = 0;
-  getAllCountry() {
+  getAllCountry(): Observable<CountryModel[]> {
     return this.httpClient
-      .get<{ name: string; population: number }[]>(
-        `${environment.baseUrl}/country`
-      )
-      .pipe(this.calculateTotalPopulation())
+      .get<CountriesModel>(`${environment.baseUrl}/country`)
       .pipe(this.calculatePercentagePopulation());
   }
 
-  filterCountry(countryPattern: string) {
+  filterCountry(countryPattern: string): Observable<CountryModel[]> {
     return this.httpClient
-      .get<{ name: string; population: number }[]>(
+      .get<CountriesModel>(
         `${environment.baseUrl}/country/filter?country=${countryPattern}`,
         { observe: 'response' }
       )
@@ -29,38 +27,23 @@ export class CountryService {
           if (res.status === 200) {
             return res.body!;
           }
-          return [];
+          return { countries: [], total: 0 };
         })
       )
-      .pipe(this.calculateTotalPopulation())
       .pipe(this.calculatePercentagePopulation());
   }
 
-  private calculateTotalPopulation() {
-    return map((res: any[]) => {
-      if (!res || !res.length) {
-        return [];
-      }
-      this.totalPopulation = res.reduce(
-        (total: number, country: { population: number }) =>
-          total + country.population,
-        0
-      );
-      return res;
-    });
-  }
-
   private calculatePercentagePopulation() {
-    return map((res: any[]) => {
-      if (!res || !res.length) {
+    return map(({ countries, total }: CountriesModel) => {
+      if (!countries || !countries.length) {
         return [];
       }
-      return res.map((country) => ({
+
+      return countries.map((country) => ({
+        _id: country._id,
         name: country.name,
         population: country.population,
-        percentage: Number(
-          (country.population / this.totalPopulation) * 100
-        ).toFixed(3),
+        percentage: Number((country.population / total) * 100).toFixed(3),
       }));
     });
   }
