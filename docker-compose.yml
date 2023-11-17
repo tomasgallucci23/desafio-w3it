@@ -11,6 +11,9 @@ services:
     links:
       - mongo
     restart: on-failure
+    depends_on:
+      - mongo
+      - front
   front:
     build:
       context: ./app
